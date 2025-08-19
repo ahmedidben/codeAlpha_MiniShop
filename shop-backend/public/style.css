@@ -1,0 +1,189 @@
+:root{
+    --primary-color: #3498db;
+    --secondary-color: #301be7;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --font-family: 'Arial', sans-serif;
+    --font-size: 16px;
+    --border-radius: 5px;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ body{
+    font-family:var(--font-family) ;
+    font-size: var(--font-size);
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 1.6;
+ }
+ a{
+    color: var(--text-color);
+    text-decoration: none;
+ }
+ ul{
+    list-style: none;
+ }
+ h1, h2, h3{
+    margin-bottom: 1rem;
+    color: var(--text-color);
+ }
+ hr{
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+ }
+ header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    margin: 0  auto 10px;
+ }
+ .card{
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;  
+    width: calc(100% - 2rem); 
+    margin: 20px auto; 
+    text-align: center;
+}
+.card h2{
+    margin-bottom: 1rem;
+    font-size: 2em;
+    color: var(--primary-color);
+}
+.row{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.row > div{
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px  ;
+    margin: 10px;
+    height: 100%;
+
+}
+.row > div > h3{
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+}
+.row > div > input{
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+}
+.row > div > label{
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    text-transform: capitalize;
+    
+}
+.row > div > button{
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.row > div > button:hover{
+    background-color: var(--secondary-color);
+}
+.row > .active{
+    width: 100%;
+    animation: swapleft 0.5s ease-in-out;
+
+
+}
+@keyframes swapleft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.row > .non-active{
+    display: none;
+    animation: swapright 0.5s ease-in-out;
+}
+@keyframes swapright {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+#me{
+    font-size: 2em;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+
+}
+.products{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+.products > .card {
+    width: 200px;
+}
+
+.products .card h3 {
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+}
+ .cardTwo button{
+    width: calc(40% - 10px);
+    margin: 0 5px;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+ .cardTwo button:hover{
+    background-color: var(--secondary-color);
+}
+ .cardTwo hr{
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+    
+ }
+ .Refresh{
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-bottom: 20px;
+ }
+    .Refresh:hover{
+        background-color: var(--primary-color);
+    }

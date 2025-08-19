@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shop Demo</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+    <header>
+        <h1>Mini Shop</h1>
+    </header>
+  
+
+  <section class="card">
+    <h2>Auth</h2>
+    <div id="me" class="muted">Checking session…</div>
+    <div class="row ">
+      <div class="Register non-active">
+        <h3>Register</h3>
+        <label for="reg-username"> username :</label>
+        <input id="reg-username" placeholder="username"><br>
+        <label for="reg-email"> email :</label>
+        <input id="reg-email" placeholder="email"><br>
+        <label for="reg-password"> password :</label>
+        <input id="reg-password" placeholder="password" type="password"><br>
+        <button onclick="register()">Register</button>
+        <button onclick="switchLogin()">login</button>
+      </div>
+      <div class="Login active">
+        <h3>Login</h3>
+        <label for="login-email"> email :</label>
+        <input id="login-email" placeholder="email"><br>
+        <label for="login-password"> password :</label>
+        <input id="login-password" placeholder="password" type="password"><br>
+        <button onclick="login()">Login</button>
+        <button onclick="logout()">Logout</button>
+        <button onclick="switchLogin()"> Register</button>
+      </div>
+    </div>
+  </section>
+  <hr>
+  <div class="row">
+    <section class="card">
+      <h2>Products</h2>
+      <div id="products">
+        <p>Loading…</p>
+    </div>
+    </section>
+    <hr>
+    <section class="card cardTwo ">
+      <h2>Cart</h2>
+      <button onclick="loadCartDetail()">Refresh</button>
+      <button onclick="clearCart()">Clear</button>
+      <div id="cart">Loading…</div>
+      <hr>
+      <button onclick="placeOrder()">Place Order</button>
+      <div id="order-result" class="muted"></div>
+    </section>
+  </div>
+<hr>
+  <section class="card ">
+    <h2>My Orders</h2>
+    <button class="Refresh" onclick="loadOrders()">Refresh</button>
+    <div id="orders" class="muted">Login to see orders.</div>
+  </section>
+
+<script>
+const API = 'http://localhost:3000';
+const fetchOpt = (method, body) => ({
+  method,
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: body ? JSON.stringify(body) : undefined
+});
+
+async function showMe() {
+  const r = await fetch(`${API}/me`, { credentials: 'include' });
+  const data = await r.json();
+  document.getElementById('me').textContent = data.user ? `Logged in as ${data.user.username}` : 'Not logged in';
+}
+
+async function register() {
+  const username = document.getElementById('reg-username').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const r = await fetch(`${API}/register`, fetchOpt('POST', { username, email, password }));
+  alert(JSON.stringify(await r.json(), null, 2));
+  showMe();
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const r = await fetch(`${API}/login`, fetchOpt('POST', { email, password }));
+  alert(JSON.stringify(await r.json(), null, 2));
+  showMe();
+  loadOrders();
+}
+
+async function logout() {
+  const r = await fetch(`${API}/logout`, fetchOpt('POST'));
+  alert(JSON.stringify(await r.json(), null, 2));
+  showMe();
+}
+
+async function loadProducts() {
+  const r = await fetch(`${API}/products`, { credentials: 'include' });
+  const products = await r.json();
+  const wrap = document.getElementById('products');
+  wrap.innerHTML = '';
+  products.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+    <img src="https://placehold.co/400" alt="${p.name}" />
+      <h3 style="font-size: 1.2em;
+    margin-bottom: 0.5rem;">${p.name} - $${p.price}</h3>
+      <p>${p.description || ''}</p>
+      <button onclick="addToCart(${p.id})"" style="
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+"
+    ">
+    Add to cart</button>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+async function addToCart(productId) {
+  await fetch(`${API}/cart/add`, fetchOpt('POST', { productId, qty: 1 }));
+  loadCartDetail();
+}
+
+async function loadCartDetail() {
+  const r = await fetch(`${API}/cart/detail`, { credentials: 'include' });
+  const data = await r.json();
+  const el = document.getElementById('cart');
+  if (!data.items || !data.items.length) {
+    el.textContent = 'Cart is empty';
+    return;
+  }
+  el.innerHTML = `
+    <ul>
+      ${data.items.map(i => `<li style="width:100%; padding=10px; background-color:#eee ;border-raduis:20px ; margin:10px 0 ; border-bottom:2px solid black;">${i.name} x ${i.qty} = $${i.lineTotal.toFixed(2)}
+        <button onclick="updateQty(${i.productId}, ${i.qty - 1})" style="width:30px;">-</button>
+        <button onclick="updateQty(${i.productId}, ${i.qty + 1})" style="width:30px;">+</button>
+      </li>`).join('')}
+    </ul>
+    <strong style=" display: block; margin:20px 0; padding:20px ; ">Total: $${data.total.toFixed(2)}</strong>
+  `;
+}
+
+async function updateQty(productId, qty) {
+  qty = Math.max(0, qty);
+  await fetch(`${API}/cart/update`, fetchOpt('POST', { productId, qty }));
+  loadCartDetail();
+}
+
+async function clearCart() {
+  await fetch(`${API}/cart/clear`, { method: 'DELETE', credentials: 'include' });
+  loadCartDetail();
+}
+
+async function placeOrder() {
+  const r = await fetch(`${API}/orders`, fetchOpt('POST'));
+  const data = await r.json();
+  document.getElementById('order-result').textContent = JSON.stringify(data);
+  loadOrders();
+  loadCartDetail();
+}
+
+async function loadOrders() {
+  const r = await fetch(`${API}/orders`, { credentials: 'include' });
+  if (r.status === 401) {
+    document.getElementById('orders').textContent = 'Login to see orders.';
+    return;
+  }
+  const orders = await r.json();
+  if (!orders.length) {
+    document.getElementById('orders').textContent = 'No orders yet.';
+    return;
+  }
+  document.getElementById('orders').innerHTML = `
+    <ul>
+      ${orders.map(o => `<li style="width : 100%; padding:10px; margin:10px 0; background-color:#eee; font-weight:bold ; color: blue ; border-radius: 20px;"><span style="font-size= 2em;">#${o.id} </span> - $${o.total} - ${new Date(o.created_at).toLocaleString()}</li>`).join('')}
+    </ul>
+  `;
+}
+
+showMe();
+loadProducts();
+loadCartDetail();
+</script>
+<script src="main.js"></script>
+</body>
+</html>
